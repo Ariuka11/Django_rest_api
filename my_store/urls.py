@@ -1,10 +1,13 @@
-from django.contrib import admin
-from django.urls import path, include
-import debug_toolbar
+from django.urls import path
+from django.urls.conf import include
+from rest_framework_nested import routers
 from . import views
 
-urlpatterns = [
-    path("products/", views.product_list),
-    path("products/<int:id>/", views.product_detail),
-    path("collections/<int:pk>/", views.collection_detail, name="collection-detail"),
-]
+router = routers.DefaultRouter()
+router.register("products", views.ProductViewSet, basename="products")
+router.register("collections", views.CollectionViewSet)
+
+products_router = routers.NestedDefaultRouter(router, "products", lookup="product")
+products_router.register("reviews", views.ReviewViewSet, basename="product-reviews")
+# URLConf
+urlpatterns = router.urls + products_router.urls

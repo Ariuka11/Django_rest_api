@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Collection
+from .models import Product, Collection, Review
 from decimal import Decimal
 
 """
@@ -12,7 +12,9 @@ class CollectionSerializer(serializers.Serializer):
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Collection
-        fields = ["id", "title"]
+        fields = ["id", "title", "products_count"]
+
+    products_count = serializers.IntegerField(read_only=True)
 
 
 # Explicit version of defining fields in serializer
@@ -62,3 +64,19 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(1.1)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = [
+            "id",
+            "date",
+            "name",
+            "description",
+        ]
+
+    # Grabbing the product id from the URL
+    def create(self, validated_data):
+        product_id = self.context["product_id"]
+        return Review.objects.create(product_id=product_id, **validated_data)
