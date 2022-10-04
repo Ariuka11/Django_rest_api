@@ -1,19 +1,23 @@
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.mixins import ListModelMixin, CreateModelMixin, DestroyModelMixin, RetrieveModelMixin
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.pagination import PageNumberPagination
-from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Count
-from .models import Product, Collection, Review, Cart, CartItem
-from .serializers import ProductSerializer, CollectionSerializer, ReviewSerializer, CartSerializer, CartItemSerializer
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   ListModelMixin, RetrieveModelMixin)
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+
 from .filters import ProductFilter
+from .models import Cart, CartItem, Collection, OrderItem, Product, Review
+from .serializers import (AddCartItemSerializer, CartItemSerializer, CartSerializer,
+                          CollectionSerializer, ProductSerializer,
+                          ReviewSerializer, UpdateCartItemSerializer)
 
 '''# A nested router.
 
@@ -191,6 +195,7 @@ class ProductViewSet(ModelViewSet):
 
         return super().get_queryset()
     """
+    book = 1
 
     def get_serializer_context(self):
         return {"request": self.request}
@@ -210,7 +215,7 @@ class CollectionViewSet(ModelViewSet):
     serializer_class = CollectionSerializer
 
     def destroy(self, request, *args, **kwargs):
-        if Products.objects.filter(collection_id=kwargs["pk"]) > 0:
+        if Product.objects.filter(collection_id=kwargs["pk"]) > 0:
             return Response(
                 {
                     "error": "Collection cannot be deleted because it includes one or more products."
@@ -239,7 +244,17 @@ class CartViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, Gener
 
 
 class CartItemViewSet(ModelViewSet):
-    serializer_class = CartItemSerializer
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return AddCartItemSerializer
+        elif self.request.method == "PATCH":
+            return UpdateCartItemSerializer
+        return CartItemSerializer
+
+    def get_serializer_context(self):
+        return {'cart_id': self.kwargs['cart_pk']}
 
     def get_queryset(self):
         return CartItem.objects.filter(cart_id=self.kwargs['cart_pk']).select_related('product')
