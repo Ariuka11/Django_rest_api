@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 from decimal import Decimal
-from .models import Customer, Order, OrderItem, Product, Collection, Review, Cart, CartItem
+from .models import Customer, Order, OrderItem, Product, Collection, ProductImage, Review, Cart, CartItem
 from .signals import order_created
 
 """
@@ -44,7 +44,19 @@ class ProductSerializer(serializers.Serializer):
 # Implicit version of defining fields in serializer
 
 
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image']
+
+    def create(self, validated_data):
+        product_id = self.context["product_id"]
+        return ProductImage.objects.create(product_id=product_id, **validated_data)
+
+
 class ProductSerializer(serializers.ModelSerializer):
+    images = ProductImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = Product
         fields = [
@@ -56,6 +68,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "unit_price",
             "price_with_tax",
             "collection",
+            "images"
         ]
 
     # Can override defualt collection representation by below code
