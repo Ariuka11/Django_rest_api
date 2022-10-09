@@ -4,4 +4,4 @@ from .tasks import notify_customers
 
 def say_hello(request):
     notify_customers.delay('Hello')
-    return render(request, 'hello.html', {'name': 'Ariuka'})
+    return render(request, 'emails/hello.html', {'name': 'Ariuka'})

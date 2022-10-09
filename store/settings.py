@@ -188,7 +188,7 @@ EMAIL_PORT = 2525
 DEFAULT_FROM_EMAIL = "from@ariunbuy.com"
 
 ADMINS = [
-    ('Mosh', 'admin@moshbuy.com')
+    ('Ariun', 'admin@ariunbuy.com')
 ]
 
 CELERY_BROKER_URL = 'redis://localhost:6379/1'

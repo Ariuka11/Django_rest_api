@@ -1,10 +1,14 @@
 {
     "django.snippets.exclude": [
-
         "cms",
         "wagtail"
     ],
     "django.i18n": true,
     "python.formatting.provider": "autopep8",
     "python.linting.enabled": true,
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
 }
