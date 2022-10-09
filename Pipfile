@@ -17,12 +17,15 @@ django-cors-headers = "*"
 redis = "*"
 celery = "*"
 flower = "*"
+django-redis = "*"
 
 [dev-packages]
 autopep8 = "*"
 pytest = "*"
 pytest-django = "*"
 model-bakery = "*"
+locust = "*"
+django-silk = "*"
 
 [requires]
 python_version = "3.10"
