@@ -23,6 +23,7 @@ admin.site.site_header = 'Store Admin'
 admin.site.index_title = "Admin"
 
 urlpatterns = [
+    path('', include("core.urls")),
     path("admin/", admin.site.urls),
     path("store/", include("my_store.urls")),
     path('playground/', include('playground.urls')),
